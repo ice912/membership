@@ -1,0 +1,63 @@
+# 이미지 이름을 'membership-app', 태그를 'v1'으로 지정하는 경우
+docker build -t membership-app:v1 .
+
+# "아까 만든 'membership-app' 제품을 꺼내서 실행해줘!"
+docker run -p 5000:5000 membership-app:v1
+
+# 현재 설정된 컨텍스트 확인
+docker context ls
+
+# 컨텍스트를 기본(default)으로 변경
+docker context use default
+
+목록에 membership-app이 있는지 확인
+docker images
+
+docker ps
+
+# 종료된 컨테이너까지 모두 보기
+docker ps -a
+
+# 에러 메시지 확인 (예: 컨테이너 이름이 membership-container인 경우)
+docker logs membership-container
+
+# 기존에 멈춘 컨테이너 삭제
+docker rm membership-container
+
+기존 컨테이너 강제 삭제 (이름 충돌 제거)
+docker rm -f membership-container
+
+# 실시간 모드로 실행 (에러가 바로 화면에 뜹니다)
+docker run -p 5000:5000 --name membership-container membership-app:v1
+
+Dockerfile 수정 (메모장에서 열기)
+파일 이름 확인 (확장자 주의!)
+윈도우에서는 파일을 만들 때 자동으로 .txt가 붙는 경우가 많습니다.
+잘못된 예: Dockerfile.txt, dockerfile.py, Dockerfile.docx
+올바른 예: Dockerfile (확장자가 아예 없어야 함)
+
+메인 페이지: http://localhost:8000
+API 명세서: http://localhost:8000/docs
+
+자주 쓰는 SQLite 명령어 요약
+테이블 구조 확인: .schema users
+데이터 개수 세기: SELECT count(*) FROM users;
+특정 이메일 찾기: SELECT * FROM users WHERE email = 'test@example.com';
+종료하고 나가기: .exit
+
+SQLite 안에서 데이터 확인하기
+.mode column
+.headers on
+SELECT * FROM users;
+
+docker-compose.yml 파일을 이용
+
+실행 명령어: docker-compose up -d
+중지 명령어: docker-compose down
+
+http://localhost:8000/
+
+💡 주의
+
+만약 상대방이 이미 다른 프로그램(예: 다른 개발 프로젝트)에서 8000번 포트를 쓰고 있다면 에러가 날 수 있습니다. 
+그럴 땐 docker-compose.yml 파일에서 앞의 숫자만 살짝 바꿔주면 됩니다. (예: "9000:8000")
