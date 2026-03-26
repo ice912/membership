@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription and Cancelation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6367FF;
+            --primary-light: #8494FF;
+            --secondary: #C9BEFF;
+            --accent: #FFDBFD;
+            --bg-color: #f7f9fc;
+            --text-color: #333;
+            --error: #ff4d4f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--accent) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-color);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(99, 103, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+            padding: 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--secondary), var(--accent));
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #888;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(132, 148, 255, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.1s ease;
+            font-size: 1rem;
+            display: inline-block;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 1.5rem;
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #444;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
+
+        .success-message {
+            color: #10b981;
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
+
+        .agreements-box {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            color: #666;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('signup')">Subscribe</div>
+            <div class="tab" onclick="switchTab('withdraw')">Unregister</div>
+        </div>
+
+        <!-- Subscription Form -->
+        <div id="signup-form" class="form-section active">
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>e-mail</label>
+                    <div class="input-group">
+                        <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+                        <button type="button" class="btn btn-outline" onclick="sendCode()">send verification</button>
+                    </div>
+                </div>
+
+                <div class="form-group" id="code-group" style="display: none;">
+                    <label>verification code</label>
+                    <div class="input-group">
+                        <input type="text" id="authCode" placeholder="6 digit verification code" maxlength="6">
+                        <button type="button" class="btn btn-outline" onclick="verifyCode()">verify</button>
+                    </div>
+                    <div id="code-success" class="success-message">Authenticated</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" name="password" placeholder="least 8 letters long, including special letters" required>
+                    <div class="error-message" id="pw-error">Password must be at least 8 letters long, including special letters</div>
+                </div>
+
+                <div class="form-group">
+                    <label>ID</label>
+                    <input type="text" id="nickname" name="nickname" placeholder="Submit your ID" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of birth (age 18+)</label>
+                    <input type="date" id="birthDate" name="birth_date" required>
+                    <div class="error-message" id="age-error">Those under 18 years of age cannot subscribe</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Selection</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="0-000-000-0000" required>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agree" name="agree" value="true" required>
+                    <div>
+                        <label for="agree"><strong>Notice of Privacy Practices & Patient Agreement</strong></label>
+                        <div class="agreements-box">
+                            <strong>Notice of Privacy Practices & Patient Agreement</strong><br><br>
+                            <strong>[Collection and Use of Protected Health Information (PHI)]</strong><br>
+                            In accordance with HIPAA (45 CFR § 164.520), this service collects and maintains your
+                            Protected Health Information (PHI) to provide healthcare services.<br>
+                            - <strong>Collected Data Elements:</strong> Name/Alias, Email, Password, Date of Birth,
+                            Gender, Contact Information, and Protected Health Information (PHI) including medical
+                            history, prescription records, and health status.<br>
+                            - <strong>Purpose of Use (TPO):</strong> Your information is used for Treatment (identifying
+                            patients and providing care), Payment (insurance processing), and Healthcare Operations
+                            (customer support, quality improvement, and legal compliance).<br>
+                            - <strong>Data Retention and Destruction:</strong> PHI is retained only as long as necessary
+                            to fulfill the purposes outlined or as required by State Board of Pharmacy record-keeping
+                            laws. Upon a valid request for account deletion, data will be permanently destroyed or
+                            de-identified unless legal retention is mandated.<br><br>
+                            <strong>[Individual Right of Access]</strong><br>
+                            Under the HIPAA Privacy Rule, you have the following rights regarding your health
+                            information:<br>
+                            - <strong>Right to Inspect and Copy:</strong> You have the right to request an electronic or
+                            paper copy of your PHI. We will provide a copy or a summary of your health information,
+                            usually within 30 days of your request.<br>
+                            - <strong>Right to Amend:</strong> You may request a correction to your PHI if you believe
+                            it is incorrect or incomplete.<br>
+                            - <strong>Accounting of Disclosures:</strong> You may request a list (accounting) of the
+                            times we've shared your health information for up to six years prior to the date of your
+                            request.<br><br>
+                            <strong>[Security Standards and Data Protection]</strong><br>
+                            To ensure the confidentiality, integrity, and availability of your PHI, we implement
+                            safeguards required by the HIPAA Security Rule:<br>
+                            - <strong>Technical Safeguards:</strong> All PHI is protected using industry-standard
+                            encryption (AES-256) both at rest and in transit (TLS/SSL). We utilize unique user IDs and
+                            automatic log-offs to prevent unauthorized access.<br>
+                            - <strong>Physical & Administrative Safeguards:</strong> Access to servers and data centers
+                            is strictly controlled. We conduct regular risk assessments and train all personnel on the
+                            secure handling of sensitive health data.<br><br>
+                            <strong>[Provision of Patient Medication Information (PMI)]</strong><br>
+                            This service complies with FDA regulations (21 CFR Part 208) and State Board of Pharmacy
+                            counseling requirements by providing:<br>
+                            - <strong>Drug Name and Description:</strong> Proprietary and non-proprietary names and
+                            physical appearance.<br>
+                            - <strong>Dosage and Administration:</strong> Instructions on route, frequency, and
+                            duration.<br>
+                            - <strong>Indications for Use:</strong> The intended purpose and clinical effects.<br>
+                            - <strong>Safety Information:</strong> Potential side effects, contraindications, and
+                            drug-drug/drug-food interactions.
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-block" style="margin-top: 2rem;">Subscribe</button>
+            </form>
+        </div>
+
+        <!-- Unregistration Form -->
+        <div id="withdraw-form" class="form-section">
+            <h3 style="margin-bottom: 1rem; color: var(--primary);">Do you really want to unsubscribe?</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 2rem; line-height: 1.5;">
+                As you unsubscribe, all of your data here would be deleted. To proceed, submit your e-mail and password.
+            </p>
+            <form id="withdrawForm" onsubmit="handleWithdraw(event)">
+                <div class="form-group">
+                    <label>e-mail</label>
+                    <input type="email" id="withdraw-email" name="email" placeholder="Registered e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="withdraw-password" name="password" placeholder="Password" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 2rem;">
+                    <button type="button" class="btn btn-outline btn-block" style="margin-top: 0;"
+                        onclick="switchTab('signup')">Cancel</button>
+                    <button type="submit" class="btn btn-block"
+                        style="margin-top: 0; background: var(--error);">Unsubscribe</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        let isEmailVerified = false;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            if (tabId === 'signup') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('signup-form').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('withdraw-form').classList.add('active');
+            }
+        }
+
+        function sendCode() {
+            const email = document.getElementById('email').value;
+            if (!email) { alert('Submit your e-mail to sign up'); return; }
+            alert('Verification code sent to ' + email + '. Submit the 6 digit number.');
+            document.getElementById('code-group').style.display = 'block';
+        }
+
+        function verifyCode() {
+            const code = document.getElementById('authCode').value;
+            if (code.length > 0) {
+                isEmailVerified = true;
+                document.getElementById('code-success').style.display = 'block';
+                document.getElementById('authCode').disabled = true;
+            } else {
+                alert('Submit verification code.');
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+
+            if (!isEmailVerified) {
+                alert('Authenticate your e-mail.');
+                return;
+            }
+
+            const password = document.getElementById('password').value;
+            const regex = /[@_!#$%^&*()<>?/|}{~:]/;
+            if (password.length < 8 || !regex.test(password)) {
+                document.getElementById('pw-error').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('pw-error').style.display = 'none';
+            }
+
+            const payload = {
+                email: document.getElementById('email').value,
+                password: password,
+                nickname: document.getElementById('nickname').value,
+                birth_date: document.getElementById('birthDate').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('phone').value,
+                agreed: document.getElementById('agree').checked
+            };
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Success: ' + result.message);
+                    event.target.reset();
+                    isEmailVerified = false;
+                    document.getElementById('code-group').style.display = 'none';
+                    document.getElementById('code-success').style.display = 'none';
+                } else {
+                    let errorDetail = result.detail;
+                    if (Array.isArray(errorDetail)) {
+                        errorDetail = errorDetail.map(e => e.msg).join('\n');
+                    }
+                    alert('Error: ' + errorDetail);
+                }
+            } catch (error) {
+                alert('Server connection failed.');
+            }
+        }
+
+        async function handleWithdraw(e) {
+    e.preventDefault();
+    const email = document.getElementById('withdraw-email').value;
+    const password = document.getElementById('withdraw-password').value;
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+
+    try {
+        const response = await fetch('/withdraw', {
+            method: 'POST', // 서버 설정에 따라 DELETE 또는 POST
+            body: formData
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert("Error: " + result.detail);
+        }
+    } catch (error) {
+        alert("Server connection failed.");
+    }
+}
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  membership-app:
+    build: .
+    container_name: membership-container
+    ports:
+      - "8000:8000"  # 외부에서 8000번으로 접속하면 컨테이너 8000번으로 연결
+    restart: always
